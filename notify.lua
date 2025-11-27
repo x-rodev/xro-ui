@@ -1,16 +1,16 @@
 -- X-Ro Notification System v3
 -- Matches xroui.lua styling with bottom-right corner positioning
 -- Created for X-Ro v3
+-- GitHub: x-rodev/xro-ui
 
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local XroNotify = {}
-XroNotify.Notifications = {}
-XroNotify.MaxNotifications = 5
-XroNotify.NotificationSpacing = 10
-XroNotify.NotificationHeight = 70
+local Notifications = {}
+local MaxNotifications = 5
+local NotificationSpacing = 10
+local NotificationHeight = 70
 
 -- Create ScreenGui container
 local function CreateNotificationContainer()
@@ -38,10 +38,10 @@ local NotificationContainer = CreateNotificationContainer()
 local function UpdateNotificationPositions()
     local yOffset = -10
     
-    for i = #XroNotify.Notifications, 1, -1 do
-        local notification = XroNotify.Notifications[i]
+    for i = #Notifications, 1, -1 do
+        local notification = Notifications[i]
         if notification and notification.Frame then
-            local targetPosition = UDim2.new(1, -310, 1, yOffset - XroNotify.NotificationHeight)
+            local targetPosition = UDim2.new(1, -310, 1, yOffset - NotificationHeight)
             
             local tween = TweenService:Create(
                 notification.Frame,
@@ -50,16 +50,16 @@ local function UpdateNotificationPositions()
             )
             tween:Play()
             
-            yOffset = yOffset - (XroNotify.NotificationHeight + XroNotify.NotificationSpacing)
+            yOffset = yOffset - (NotificationHeight + NotificationSpacing)
         end
     end
 end
 
 -- Remove notification
 local function RemoveNotification(notification)
-    for i, notif in ipairs(XroNotify.Notifications) do
+    for i, notif in ipairs(Notifications) do
         if notif == notification then
-            table.remove(XroNotify.Notifications, i)
+            table.remove(Notifications, i)
             break
         end
     end
@@ -102,7 +102,7 @@ local function RemoveNotification(notification)
 end
 
 -- Create notification
-function XroNotify:Notify(options)
+local function Notify(options)
     -- Parse options
     local title = options.Title or options.title or "Notification"
     local description = options.Description or options.description or options.Text or options.text or ""
@@ -110,8 +110,8 @@ function XroNotify:Notify(options)
     local type = options.Type or options.type or "Info"
     
     -- Remove oldest notification if max reached
-    if #XroNotify.Notifications >= XroNotify.MaxNotifications then
-        RemoveNotification(XroNotify.Notifications[1])
+    if #Notifications >= MaxNotifications then
+        RemoveNotification(Notifications[1])
     end
     
     -- Color based on type
@@ -127,8 +127,8 @@ function XroNotify:Notify(options)
     -- Create notification frame
     local notifFrame = Instance.new("Frame")
     notifFrame.Name = "Notification"
-    notifFrame.Size = UDim2.new(0, 300, 0, XroNotify.NotificationHeight)
-    notifFrame.Position = UDim2.new(1, 50, 1, -10 - XroNotify.NotificationHeight) -- Start off-screen
+    notifFrame.Size = UDim2.new(0, 300, 0, NotificationHeight)
+    notifFrame.Position = UDim2.new(1, 50, 1, -10 - NotificationHeight) -- Start off-screen
     notifFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     notifFrame.BorderSizePixel = 0
     notifFrame.Parent = NotificationContainer
@@ -232,13 +232,13 @@ function XroNotify:Notify(options)
         Duration = duration
     }
     
-    table.insert(XroNotify.Notifications, notification)
+    table.insert(Notifications, notification)
     
     -- Slide in animation
     local slideIn = TweenService:Create(
         notifFrame,
         TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-        {Position = UDim2.new(1, -310, 1, -10 - XroNotify.NotificationHeight)}
+        {Position = UDim2.new(1, -310, 1, -10 - NotificationHeight)}
     )
     slideIn:Play()
     
@@ -267,9 +267,4 @@ function XroNotify:Notify(options)
     return notification
 end
 
--- Alias for compatibility
-function XroNotify.new(options)
-    return XroNotify:Notify(options)
-end
-
-return XroNotify
+return Notify
